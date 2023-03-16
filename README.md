@@ -21,7 +21,7 @@ This tutorial uses Medusa v1.7.12. It is not guaranteed that it will work with f
 1. Clone this repository:
 
 ```bash
-git clone <url>
+git clone git@github.com:menard-codes/FirebaseMedusaNotifications.git
 ```
 
 2. Change directory and install dependencies:
