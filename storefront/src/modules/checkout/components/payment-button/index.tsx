@@ -230,8 +230,8 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   const { onPaymentCompleted } = useCheckout();
   const { cart } = useCart();
 
-  // Function to generate device token and save it to Firestore
-  const generateAndSaveDeviceToken = async () => {
+  // Function to get registration token and save it to Firestore
+  const getAndSaveRegistrationToken = async () => {
     try {
       const messaging = getMessaging(app);
       const token = await getToken(messaging, {
@@ -239,14 +239,14 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
       });
 
       if (token) {
-        // Save the generated device token in Firebase Firestore
+        // Save the generated registration token in Firebase Firestore
         const firestore = getFirestore(app);
         await setDoc(doc(firestore, "tokens", `${cart?.id}`), {
-          deviceToken: token,
+          registrationToken: token,
         });
       } else {
         console.log(
-          "No registration token available. Request Notification permission to generate one"
+          "No registration token available. Request Notification permission to get one"
         );
       }
     } catch (error) {
@@ -255,7 +255,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   };
 
   const handlePayment = async () => {
-    await generateAndSaveDeviceToken();
+    await getAndSaveRegistrationToken();
 
     setSubmitting(true);
 

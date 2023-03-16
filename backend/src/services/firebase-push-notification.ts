@@ -25,8 +25,8 @@ export default class FirebasePushNotification extends AbstractNotificationServic
         credential: cert({
           type: process.env.FIREBASE_TYPE,
           project_id: process.env.FIREBASE_PROJECT_ID,
-          private_key: process.env.FIREBASE_PRIVATE_KEY_ID,
-          private_key_id: process.env.FIREBASE_PRIVATE_KEY,
+          private_key: process.env.FIREBASE_PRIVATE_KEY,
+          private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
           client_email: process.env.FIREBASE_CLIENT_EMAIL,
           client_id: process.env.FIREBASE_CLIENT_ID,
           auth_uri: process.env.FIREBASE_AUTH_URI,
@@ -48,36 +48,38 @@ export default class FirebasePushNotification extends AbstractNotificationServic
       const order = await this.orderService.retrieve(data.id);
 
       const db = getFirestore();
-      const deviceTokenDocRef = db.collection("tokens").doc(order.cart_id);
+      const registrationTokenDocRef = db
+        .collection("tokens")
+        .doc(order.cart_id);
 
       try {
-        const deviceTokenDoc = await deviceTokenDocRef.get();
-        if (!deviceTokenDoc.exists) {
-          console.log("No such document");
+        const registrationTokenDoc = await registrationTokenDocRef.get();
+        if (!registrationTokenDoc.exists) {
+          throw new Error("No such document");
         } else {
-          const deviceToken: string = deviceTokenDoc.data().deviceToken;
+          const registrationToken: string =
+            registrationTokenDoc.data().registrationToken;
           const message = {
             notification: {
               title: "Order Placed",
               body: "We received your order. It'll be processed right away",
             },
-            token: deviceToken,
+            token: registrationToken,
           };
           const res = await getMessaging().send(message as Message);
           console.log("Successfully sent the notif: ", order.cart_id, res);
+          return {
+            to: registrationToken,
+            status: "done",
+            data: {
+              title: "Order Placed",
+              body: "We received your order. It'll be processed right away",
+            },
+          };
         }
       } catch (error) {
         console.error("Error while sending the push notification: ", error);
       }
-
-      return {
-        to: order.email,
-        status: "done",
-        data: {
-          subject: "You placed a new order!",
-          items: order.items,
-        },
-      };
     }
   }
 
@@ -87,6 +89,15 @@ export default class FirebasePushNotification extends AbstractNotificationServic
     attachmentGenerator: unknown
   ): Promise<{ to: string; status: string; data: Record<string, unknown> }> {
     const to: string = config.to ? config.to : notification.to;
+
+    const message = {
+      notification: {
+        title: "Order Placed",
+        body: "We received your order. It'll be processed right away",
+      },
+      token: to,
+    };
+    await getMessaging().send(message as Message);
     console.log("Notification resent");
     return {
       to,
