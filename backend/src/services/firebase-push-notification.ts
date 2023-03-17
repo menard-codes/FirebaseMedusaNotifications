@@ -10,7 +10,7 @@ import {
 import { getFirestore } from "firebase-admin/firestore";
 import { Message, getMessaging } from "firebase-admin/messaging";
 
-export default class FirebasePushNotification extends AbstractNotificationService {
+export default class FirebasePushNotificationService extends AbstractNotificationService {
   protected manager_: EntityManager;
   protected transactionManager_: EntityManager;
   static identifier = "firebase-push-notification";
