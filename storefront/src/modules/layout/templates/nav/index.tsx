@@ -46,7 +46,7 @@ const Nav = () => {
     setNotifPermission(Notification.permission);
   }, []);
 
-  const handleClick = () => {
+  const handleNotifPermissionRequest = () => {
     if (typeof window !== "undefined") {
       if (!Notification) {
         console.error("This browser doesn't support Notifications");
@@ -84,7 +84,7 @@ const Nav = () => {
           </p>
           <button
             className="bg-yellow-500 px-3 py-1 rounded-md"
-            onClick={handleClick}
+            onClick={handleNotifPermissionRequest}
           >
             Allow Notifications
           </button>
